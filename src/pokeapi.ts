@@ -90,7 +90,7 @@ export type Location = {
         language: APILink;
         name: string;
     }[];
-    pokemon_encounters: PokemonEncounter;
+    pokemon_encounters: PokemonEncounter[];
 };
 
 type PokemonEncounter = {

@@ -59,6 +59,30 @@ export class PokeAPI {
             throw new Error(`Error fetching location '${locationName}': ${(e as Error).message}`);
         }
     }
+
+    async fetchPokemon(pokemonName: string): Promise<Pokemon> {
+        let url = `${PokeAPI.baseURL}/pokemon/${pokemonName}/`
+        
+        const cache_entry = this.cache.get<Pokemon>(pokemonName);
+        if (cache_entry) {
+            return cache_entry;
+        }
+
+
+        try {
+            const response = await fetch(url);
+        
+            if (!response.ok) {
+                throw new Error(`${response.status} ${response.statusText}`);
+            }
+
+            const pokemon: Pokemon = await response.json();
+            this.cache.add(pokemonName, pokemon);
+            return pokemon;
+        } catch (e) {
+            throw new Error(`Error fetching pokemon '${pokemonName}': ${(e as Error).message}`);
+        }
+    }
 }
 
 type APILink = {
@@ -106,4 +130,90 @@ type PokemonEncounter = {
         max_number: number;
         version: APILink;
     }[];
+}
+
+export type Pokemon = {
+    id: number;
+    name: string;
+    base_experience: number;
+    height: number;
+    is_default: boolean;
+    order: number;
+    weight: number;
+    abilities: {
+        is_hidden: boolean;
+        slot: number;
+        ability: APILink;
+    }[];
+    forms: APILink[];
+    game_indices: {
+        game_number: number;
+        version: APILink;
+    }[];
+    held_items: {
+        item: APILink;
+        version_details: {
+            rarity: number;
+            version: APILink;
+        }[];
+    }[];
+    location_area_encounters: string;
+    moves: {
+        move: APILink;
+        version_group_details: {
+            level_learned_at: number;
+            version_group: APILink;
+            move_learn_method: APILink;
+            order: number;
+        }[];
+    }[];
+    species: APILink;
+    sprites: {
+        back_default: string;
+        back_female?: any;
+        back_shiny: string;
+        back_shiny_female?: any;
+        front_default: string;
+        front_female?: any;
+        other: {
+            dream_world: {
+                front_default: string;
+                front_female?: any;
+            };
+            home: {
+                front_default: string;
+                front_female?: any;
+                front_shiny: string;
+                front_shiny_female?: any;
+            };
+            "official-artwork": {
+                front_default: string;
+                front_shiny: string;
+            };
+            showdown: {
+                back_default: string
+                back_female?: any
+                back_shiny: string
+                back_shiny_female?: any
+                front_default: string
+                front_female?: any
+                front_shiny: string
+                front_shiny_female?: any                
+            }
+        };
+        versions: any;
+
+    };
+    cries: any;
+    stats: {
+        base_stat: number;
+        effort: number;
+        stat: APILink;
+    }[];
+    types: {
+        slot: number;
+        type: APILink;
+    }[];
+    past_types: any[];
+    past_abilities: any[];
 }
